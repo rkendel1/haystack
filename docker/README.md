@@ -4,6 +4,17 @@
 
 [Haystack](https://github.com/deepset-ai/haystack) is an end-to-end LLM framework that allows you to build applications powered by LLMs, Transformer models, vector search and more. Whether you want to perform retrieval-augmented generation (RAG), document search, question answering or answer generation, Haystack can orchestrate state-of-the-art embedding models and LLMs into pipelines to build end-to-end NLP applications and solve your use case.
 
+## SearXNG Integration
+
+This Docker setup includes [SearXNG](https://docs.searxng.org/), a free internet metasearch engine that aggregates results from various search services. SearXNG allows you to perform web searches without requiring API keys from commercial search providers.
+
+To start the SearXNG service:
+```sh
+docker-compose up -d
+```
+
+The SearXNG instance will be available at `http://localhost:8888` and can be used with the `SearXNGWebSearch` component in Haystack.
+
 ## Haystack 2.0
 
 For the latest version of Haystack there's only one image available:

@@ -8,7 +8,9 @@ This directory contains a FastAPI backend that demonstrates how to use the Supab
 - **Hybrid Search**: Search using both semantic and keyword search
 - **RAG (Retrieval-Augmented Generation)**: Chat interface with context retrieval
 - **Smart Onboarding**: Automated business context discovery and management
-- **Context Management**: First-class context objects with full CRUD operations
+- **First-Class Context Canonicalization**: Business reasoning layer with 6 canonical document types
+- **Relationship Graph**: Explicit links between context artifacts for reasoning
+- **Context Management**: Full CRUD operations with versioning and soft deletes
 
 ## Setup
 
@@ -262,6 +264,92 @@ Confirm a context object (shortcut for updating status to 'confirmed').
 
 Reject a context object (shortcut for updating status to 'rejected').
 
+### Relationship Endpoints
+
+#### POST /context/relationships
+
+Create a relationship between two context objects.
+
+**Request:**
+```json
+{
+  "from_context_id": "uuid1",
+  "to_context_id": "uuid2",
+  "relationship_type": "supports",
+  "metadata": {"strength": "strong"}
+}
+```
+
+#### GET /context/{id}/relationships
+
+Get all relationships for a context object.
+
+**Query Parameters:**
+- `direction`: 'outgoing', 'incoming', or 'both' (default: both)
+
+#### GET /context/{id}/related
+
+Get related context objects.
+
+**Query Parameters:**
+- `relationship_type`: Filter by relationship type (optional)
+- `direction`: 'outgoing' or 'incoming' (default: outgoing)
+
+#### DELETE /context/relationships
+
+Delete a specific relationship.
+
+**Query Parameters:**
+- `from_context_id`: Source context ID
+- `to_context_id`: Target context ID
+- `relationship_type`: Type of relationship
+
+### Canonical Type Endpoints
+
+#### POST /context/validate
+
+Validate that content conforms to canonical schema for a given type.
+
+**Query Parameters:**
+- `context_type`: The canonical type (idea, decision, assumption, evidence, plan, outcome)
+
+**Request:**
+```json
+{
+  "problem_statement": "Sales team lacks context",
+  "proposed_solution": "Build context panel",
+  "target_user": "Account Executives",
+  "claimed_advantage": "Reduces prep time",
+  "confidence": 0.7
+}
+```
+
+**Response:**
+```json
+{
+  "valid": true,
+  "type": "idea",
+  "validated_content": {...}
+}
+```
+
+#### GET /context/types
+
+Get information about all canonical types, including required fields and schemas.
+
+**Response:**
+```json
+{
+  "canonical_types": ["idea", "decision", "assumption", "evidence", "plan", "outcome"],
+  "types_info": {
+    "idea": {
+      "required_fields": ["problem_statement", "proposed_solution", "target_user", "claimed_advantage", "confidence"],
+      "schema": {...}
+    }
+  }
+}
+```
+
 ## Project Structure
 
 ```
@@ -273,14 +361,23 @@ backend/
 ├── pipelines/
 │   └── rag_pipeline.py      # RAG pipeline setup
 ├── models/
-│   └── context.py           # Pydantic models for context objects
+│   ├── __init__.py          # Models exports
+│   ├── context.py           # Base context models (ContextObject, OnboardingSession)
+│   └── canonical_types.py   # Canonical document types (6 first-class types)
 ├── services/
-│   └── context_db.py        # Database service layer for context management
+│   └── context_db.py        # Database service layer with relationship support
 ├── reasoning/
-│   └── context_extraction.py # AI-powered context extraction pipelines
+│   ├── context_extraction.py # AI-powered context extraction pipelines
+│   └── type_mapper.py       # Legacy to canonical type migration
+├── scripts/
+│   └── migrate_to_canonical.py # Migration script for existing data
 ├── tests/
-│   └── test_context_api.py  # API tests
+│   ├── test_context_api.py  # API tests
+│   ├── test_canonical_types.py # Canonical type validation tests
+│   ├── test_type_mapper.py  # Migration logic tests
+│   └── test_relationships.py # Relationship graph tests
 ├── main.py                  # FastAPI application
+├── CANONICAL_TYPES.md      # Canonical types documentation
 ├── Dockerfile              # Docker configuration
 └── requirements.txt        # Python dependencies
 ```
@@ -300,14 +397,56 @@ The Smart Onboarding system automatically discovers business context during user
 3. **User Review**: All inferred context is presented for review, editing, approval, or rejection
 4. **Context Management**: Users can continuously manage context objects post-onboarding
 
-### Context Object Types
+## First-Class Context Canonicalization
 
-- **company**: Company profile and business information
-- **industry**: Industry classification and characteristics
-- **regulation**: Applicable regulatory frameworks
-- **competitor**: Competitive landscape and market adjacencies
-- **persona**: Customer archetypes (roles, not individuals)
-- **assumption**: Baseline business assumptions
+All context artifacts are normalized into **six canonical document types**:
+
+1. **Ideas** - Uncommitted concepts and hypotheses
+2. **Decisions** - Explicit commitments
+3. **Assumptions** - Beliefs taken as true
+4. **Evidence** - Support or refutation
+5. **Plans** - Intent and execution tracking
+6. **Outcomes** - What actually happened
+
+### Canonical Context Benefits
+
+- **Prevents Decision Re-litigation**: Past decisions are explicitly documented
+- **Enables Historical Reasoning**: "What assumptions supported this decision?"
+- **Surfaces Hidden Risk**: Track assumption decay and contradicting evidence
+- **Bridges Strategy → Reality**: Link plans to outcomes
+- **Enables Learning**: Compare expected vs actual outcomes
+
+### Legacy Type Migration
+
+Legacy context types (company, regulation, competitor, persona) are automatically migrated to canonical Evidence format. The system includes:
+
+- **Type Inference**: Automatically determines canonical type from content
+- **Content Migration**: Converts legacy structures to canonical schemas
+- **Validation**: Ensures all content meets canonical requirements
+- **Backward Compatibility**: No breaking changes to existing APIs
+
+To migrate existing data:
+
+```bash
+# Dry run (see what would change)
+python backend/scripts/migrate_to_canonical.py --dry-run
+
+# Apply migration
+python backend/scripts/migrate_to_canonical.py
+```
+
+For detailed documentation, see [CANONICAL_TYPES.md](CANONICAL_TYPES.md).
+
+### Context Object Types (Legacy)
+
+**Note**: These are legacy types that map to canonical Evidence:
+
+- **company**: Company profile and business information → Evidence
+- **industry**: Industry classification and characteristics → Evidence
+- **regulation**: Applicable regulatory frameworks → Evidence
+- **competitor**: Competitive landscape and market adjacencies → Evidence  
+- **persona**: Customer archetypes (roles, not individuals) → Evidence
+- **assumption**: Baseline business assumptions → Assumption (canonical)
 
 ### Security Principles
 
@@ -362,7 +501,13 @@ curl -X POST http://localhost:8000/search \
 ### Running Tests
 
 ```bash
+# Run all backend tests
 pytest backend/tests/
+
+# Run specific test files
+pytest backend/tests/test_canonical_types.py
+pytest backend/tests/test_type_mapper.py
+pytest backend/tests/test_relationships.py
 ```
 
 ### API Documentation
@@ -387,8 +532,12 @@ psql $DATABASE_URL < ../supabase/init/003_context_management.sql
 
 ## Documentation
 
-For detailed documentation on the Smart Onboarding system, see:
-- [Smart Onboarding Documentation](../docs/SMART_ONBOARDING.md)
+For detailed documentation, see:
+- [Canonical Types Documentation](CANONICAL_TYPES.md) - Complete guide to the 6 canonical document types
+- [Smart Onboarding Documentation](../docs/SMART_ONBOARDING.md) - Smart Onboarding system overview
+- API Documentation (when server is running):
+  - Swagger UI: http://localhost:8000/docs
+  - ReDoc: http://localhost:8000/redoc
 
 ## Notes
 

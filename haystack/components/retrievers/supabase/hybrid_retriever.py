@@ -23,7 +23,7 @@ class SupabaseHybridRetriever:
     Example:
         ```python
         from haystack.components.retrievers.supabase import SupabaseHybridRetriever
-        from haystack.document_stores.supabase import SupabaseDocumentStore
+        from backend.document_store.supabase_store import SupabaseDocumentStore
 
         document_store = SupabaseDocumentStore(
             db_url="postgresql://postgres:postgres@localhost:54322/postgres"

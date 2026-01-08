@@ -15,7 +15,7 @@ from haystack import Pipeline
 from haystack.components.embedders import OpenAIDocumentEmbedder, OpenAITextEmbedder
 from haystack.components.retrievers.supabase import SupabaseHybridRetriever
 from haystack.dataclasses import Document
-from haystack.document_stores.supabase import SupabaseDocumentStore
+from backend.document_store.supabase_store import SupabaseDocumentStore
 
 # Set your OpenAI API key
 # os.environ["OPENAI_API_KEY"] = "your-api-key-here"

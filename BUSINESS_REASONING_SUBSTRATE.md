@@ -80,7 +80,7 @@ Explicit relationship types:
 - `contradicts` - Context → Context
 
 #### 5. **Hybrid Search Infrastructure**
-Implemented in `haystack/document_stores/supabase/` and `haystack/components/retrievers/supabase/`:
+Implemented in `backend/document_store/` and `haystack/components/retrievers/supabase/`:
 
 - Semantic vector search using pgvector
 - Keyword full-text search using PostgreSQL

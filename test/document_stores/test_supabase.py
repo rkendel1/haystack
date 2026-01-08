@@ -5,8 +5,7 @@
 import pytest
 
 from haystack import Document
-from haystack.document_stores.errors import DuplicateDocumentError
-from haystack.document_stores.types import DuplicatePolicy
+from backend.document_store.supabase_store import DuplicateDocumentError, DuplicatePolicy
 
 
 # Skip all tests if sqlalchemy or psycopg2 not available
@@ -25,7 +24,7 @@ def db_url():
 @pytest.fixture
 def document_store(db_url):
     """Create a SupabaseDocumentStore for testing."""
-    from haystack.document_stores.supabase import SupabaseDocumentStore
+    from backend.document_store.supabase_store import SupabaseDocumentStore
 
     store = SupabaseDocumentStore(db_url=db_url)
 
@@ -52,21 +51,21 @@ class TestSupabaseDocumentStore:
     @pytest.mark.integration
     def test_to_dict(self, db_url):
         """Test serialization to dictionary."""
-        from haystack.document_stores.supabase import SupabaseDocumentStore
+        from backend.document_store.supabase_store import SupabaseDocumentStore
 
         store = SupabaseDocumentStore(db_url=db_url)
         data = store.to_dict()
 
-        assert data["type"] == "haystack.document_stores.supabase.document_store.SupabaseDocumentStore"
+        assert data["type"] == "backend.document_store.supabase_store.SupabaseDocumentStore"
         assert data["init_parameters"]["db_url"] == db_url
 
     @pytest.mark.integration
     def test_from_dict(self, db_url):
         """Test deserialization from dictionary."""
-        from haystack.document_stores.supabase import SupabaseDocumentStore
+        from backend.document_store.supabase_store import SupabaseDocumentStore
 
         data = {
-            "type": "haystack.document_stores.supabase.document_store.SupabaseDocumentStore",
+            "type": "backend.document_store.supabase_store.SupabaseDocumentStore",
             "init_parameters": {"db_url": db_url},
         }
 

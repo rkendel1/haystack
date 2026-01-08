@@ -6,9 +6,9 @@ This integration adds a fully self-hosted, Dockerized document store for Haystac
 
 ## Components Delivered
 
-### 1. Core Document Store (`haystack/document_stores/supabase/`)
+### 1. Core Document Store (`backend/document_store/`)
 
-**SupabaseDocumentStore** - A fully-featured document store implementing the Haystack DocumentStore protocol:
+**SupabaseDocumentStore** - A fully-featured document store implementing a custom backend store:
 
 - ✅ Implements all required DocumentStore methods (write_documents, filter_documents, count_documents, delete_documents)
 - ✅ Supports semantic vector search using pgvector

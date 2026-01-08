@@ -20,6 +20,7 @@ and LLMs into pipelines to build end-to-end NLP applications and solve your use 
 - [Documentation](#documentation)
 - [Features](#features)
 - [Business Reasoning Substrate](#business-reasoning-substrate)
+- [Use Cases](#features)
 - [Hayhooks (REST API Deployment)](#-tip-1)
 - [Haystack Enterprise](#haystack-enterprise-best-practices-and-expert-support)
 - [deepset Studio](#-deepset-studio-your-development-environment-for-haystack)

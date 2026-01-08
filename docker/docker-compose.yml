@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ../frontend
+    container_name: haystack-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    networks:
+      - haystack-network
+    restart: unless-stopped
+
   searxng:
     image: searxng/searxng:latest
     container_name: haystack-searxng

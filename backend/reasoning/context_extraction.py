@@ -326,7 +326,11 @@ class OnboardingPipeline:
         return all_contexts
 
     def _generate_baseline_assumptions(self, company_data: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Generate baseline assumptions about the business context."""
+        """
+        Generate baseline assumptions about the business context.
+
+        Returns assumptions in canonical AssumptionContent format.
+        """
         assumptions = []
 
         # Assumption about data handling
@@ -334,9 +338,11 @@ class OnboardingPipeline:
             {
                 "type": "assumption",
                 "content": {
-                    "category": "data_handling",
                     "assumption": "Company collects and processes customer data",
-                    "rationale": "Most modern businesses handle some customer information",
+                    "confidence": 0.7,
+                    "risk_if_wrong": "Privacy and compliance strategies may be overly complex for actual needs",
+                    "category": "data_handling",
+                    "evidence_links": [],
                 },
                 "source": "inferred",
                 "confidence": 0.7,
@@ -349,9 +355,11 @@ class OnboardingPipeline:
             {
                 "type": "assumption",
                 "content": {
-                    "category": "vendor_usage",
                     "assumption": "Company uses third-party vendors for operations",
-                    "rationale": "Standard business practice for SaaS, cloud, and support services",
+                    "confidence": 0.8,
+                    "risk_if_wrong": "Vendor management and procurement processes may be unnecessary overhead",
+                    "category": "vendor_usage",
+                    "evidence_links": [],
                 },
                 "source": "inferred",
                 "confidence": 0.8,
@@ -364,9 +372,11 @@ class OnboardingPipeline:
             {
                 "type": "assumption",
                 "content": {
-                    "category": "compliance",
                     "assumption": "Company needs to maintain compliance documentation",
-                    "rationale": "Required for most regulated industries and B2B sales",
+                    "confidence": 0.7,
+                    "risk_if_wrong": "May invest in compliance infrastructure before it's actually required",
+                    "category": "compliance",
+                    "evidence_links": [],
                 },
                 "source": "inferred",
                 "confidence": 0.7,

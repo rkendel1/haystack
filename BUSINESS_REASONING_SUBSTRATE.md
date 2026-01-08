@@ -316,7 +316,7 @@ All enhancements must:
 - Frontend UI for onboarding and context review
 
 ### 📋 Planned (Must-Have Enhancements)
-See [Roadmap](#roadmap-must-have-enhancements) section above and individual enhancement documents in `docs/enhancements/`.
+See [Roadmap](#roadmap-must-have-enhancements) section above for all enhancement details.
 
 ### 🔮 Future (Nice-to-Have)
 - Multi-tenant support for organizations
@@ -338,9 +338,9 @@ See [Roadmap](#roadmap-must-have-enhancements) section above and individual enha
    - Study `backend/services/context_db.py` for API patterns
 
 2. **Explore the enhancements:**
-   - Each enhancement has detailed documentation in `docs/enhancements/`
+   - Review the [Roadmap](#roadmap-must-have-enhancements) section above for enhancement details
    - Pick an enhancement to implement based on business priority
-   - Follow the deliverables and acceptance criteria
+   - Follow the deliverables defined in each enhancement description
 
 3. **Test with existing infrastructure:**
    - Use the onboarding flow to create sample context

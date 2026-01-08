@@ -19,6 +19,7 @@ and LLMs into pipelines to build end-to-end NLP applications and solve your use 
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Features](#features)
+- [Business Reasoning Substrate](#business-reasoning-substrate)
 - [Use Cases](#features)
 - [Hayhooks (REST API Deployment)](#-tip-1)
 - [Haystack Enterprise](#haystack-enterprise-best-practices-and-expert-support)
@@ -71,6 +72,20 @@ Some examples of what you can do with Haystack:
 -   Scale to millions of docs using retrievers and production-scale components.
 -   Use **off-the-shelf models** or **fine-tune** them to your data.
 -   Use **user feedback** to evaluate, benchmark, and continuously improve your models.
+
+## Business Reasoning Substrate
+
+> [!NOTE]
+>
+> **Haystack is more than a search engine** — it can be a persistent, actionable thinking substrate for organizations.
+>
+> The **Business Reasoning Substrate** extends Haystack with first-class support for organizational thinking artifacts: Ideas, Decisions, Assumptions, Evidence, Plans, and Outcomes. This transforms Haystack from "AI with memory" into a strategic decision-making tool that:
+> - Stores and governs all critical thinking artifacts in a structured way
+> - Enables traceability of decisions, assumptions, and outcomes
+> - Provides institutional memory that supports reasoning
+> - Serves as a foundation for predictive, context-aware, risk-conscious decision-making
+>
+> 📖 **[Read the full Business Reasoning Substrate documentation](./BUSINESS_REASONING_SUBSTRATE.md)** to learn about the vision, current capabilities, and roadmap for must-have enhancements.
 
 > [!TIP]
 >

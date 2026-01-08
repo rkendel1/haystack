@@ -13,6 +13,11 @@ CREATE TABLE IF NOT EXISTS documents (
   embedding VECTOR(1536),
 
   -- Full-text search vector (automatically generated from content)
+  -- NOTE: Uses 'english' text search configuration. For international deployments,
+  -- consider using a different language or implementing language detection.
+  -- Supported languages: simple, arabic, danish, dutch, english, finnish, french,
+  -- german, hungarian, italian, norwegian, portuguese, romanian, russian, spanish,
+  -- swedish, turkish
   tsv tsvector GENERATED ALWAYS AS (
     to_tsvector('english', unaccent(content))
   ) STORED,

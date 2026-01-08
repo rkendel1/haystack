@@ -167,7 +167,7 @@ class SupabaseDocumentStore:
                     embedding_str = "[" + ",".join(map(str, embedding_list)) + "]"
 
                 # Insert or update document
-                if policy == DuplicatePolicy.OVERWRITE or (policy == DuplicatePolicy.NONE and exists):
+                if policy == DuplicatePolicy.OVERWRITE:
                     conn.execute(
                         self._sqlalchemy_text("""
                             INSERT INTO documents (id, content, metadata, embedding)
@@ -233,16 +233,19 @@ class SupabaseDocumentStore:
         WHERE embedding IS NOT NULL
         """
 
+        params = {"embedding": embedding_str, "top_k": top_k}
+
         if filters and "field" in filters and filters["field"].startswith("meta."):
-            # Add simple metadata filtering
+            # Add simple metadata filtering using parameterized query
             meta_key = filters["field"].replace("meta.", "")
             value = filters.get("value")
-            query += f" AND metadata @> '{json.dumps({meta_key: value})}'::jsonb"
+            query += " AND metadata @> :metadata_filter::jsonb"
+            params["metadata_filter"] = json.dumps({meta_key: value})
 
         query += " ORDER BY embedding <=> :embedding::vector LIMIT :top_k"
 
         with self.engine.connect() as conn:
-            result = conn.execute(self._sqlalchemy_text(query), {"embedding": embedding_str, "top_k": top_k})
+            result = conn.execute(self._sqlalchemy_text(query), params)
             return [(row[0], row[1], row[2], row[3]) for row in result.fetchall()]
 
     def keyword_search(self, query_text: str, top_k: int = 10, filters: Optional[dict] = None):
@@ -261,14 +264,17 @@ class SupabaseDocumentStore:
         WHERE tsv @@ plainto_tsquery('english', :q)
         """
 
+        params = {"q": query_text, "top_k": top_k}
+
         if filters and "field" in filters and filters["field"].startswith("meta."):
-            # Add simple metadata filtering
+            # Add simple metadata filtering using parameterized query
             meta_key = filters["field"].replace("meta.", "")
             value = filters.get("value")
-            query += f" AND metadata @> '{json.dumps({meta_key: value})}'::jsonb"
+            query += " AND metadata @> :metadata_filter::jsonb"
+            params["metadata_filter"] = json.dumps({meta_key: value})
 
         query += " ORDER BY score DESC LIMIT :top_k"
 
         with self.engine.connect() as conn:
-            result = conn.execute(self._sqlalchemy_text(query), {"q": query_text, "top_k": top_k})
+            result = conn.execute(self._sqlalchemy_text(query), params)
             return [(row[0], row[1], row[2], row[3]) for row in result.fetchall()]

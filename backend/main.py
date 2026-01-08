@@ -125,8 +125,14 @@ async def chat_with_rag(request: ChatRequest):
         # Create RAG pipeline
         pipeline = create_rag_pipeline()
 
-        # Run pipeline
-        result = pipeline.run({"text_embedder": {"text": request.query}, "prompt_builder": {"query": request.query}})
+        # Run pipeline with all required inputs
+        result = pipeline.run(
+            {
+                "text_embedder": {"text": request.query},
+                "retriever": {"query": request.query},
+                "prompt_builder": {"query": request.query},
+            }
+        )
 
         return {"query": request.query, "answer": result["llm"]["replies"][0] if result.get("llm") else "No answer"}
     except Exception as e:

@@ -16,8 +16,12 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install local haystack for custom integrations
+COPY haystack /app/haystack
+RUN pip install -e /app/haystack
+
 # Copy application code
-COPY . /app/backend
+COPY backend /app/backend
 
 # Expose port
 EXPOSE 8000

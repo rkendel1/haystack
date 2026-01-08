@@ -10,6 +10,7 @@ for use in backend applications.
 """
 
 import os
+
 from haystack.document_stores.supabase import SupabaseDocumentStore
 
 

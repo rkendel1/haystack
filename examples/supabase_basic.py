@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2022-present deepset GmbH <info@deepset.ai>
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -15,9 +14,10 @@ This script demonstrates how to:
 """
 
 import os
+
+from haystack.components.embedders import OpenAIDocumentEmbedder, OpenAITextEmbedder
 from haystack.dataclasses import Document
 from haystack.document_stores.supabase import SupabaseDocumentStore
-from haystack.components.embedders import OpenAITextEmbedder, OpenAIDocumentEmbedder
 
 # Set your OpenAI API key
 # os.environ["OPENAI_API_KEY"] = "your-api-key-here"
@@ -27,6 +27,7 @@ DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:543
 
 
 def main():
+    """Run the basic Supabase document store example."""
     print("=" * 60)
     print("Supabase Document Store Example")
     print("=" * 60)
@@ -34,7 +35,7 @@ def main():
     # Initialize document store
     print("\n1. Initializing SupabaseDocumentStore...")
     document_store = SupabaseDocumentStore(db_url=DB_URL)
-    print(f"   Connected to database")
+    print("   Connected to database")
 
     # Create sample documents
     print("\n2. Creating sample documents...")

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2022-present deepset GmbH <info@deepset.ai>
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -11,11 +10,12 @@ to combine semantic and keyword search in a Haystack pipeline.
 """
 
 import os
+
 from haystack import Pipeline
+from haystack.components.embedders import OpenAIDocumentEmbedder, OpenAITextEmbedder
+from haystack.components.retrievers.supabase import SupabaseHybridRetriever
 from haystack.dataclasses import Document
 from haystack.document_stores.supabase import SupabaseDocumentStore
-from haystack.components.embedders import OpenAITextEmbedder, OpenAIDocumentEmbedder
-from haystack.components.retrievers.supabase import SupabaseHybridRetriever
 
 # Set your OpenAI API key
 # os.environ["OPENAI_API_KEY"] = "your-api-key-here"
@@ -30,11 +30,13 @@ def setup_documents(document_store):
 
     documents = [
         Document(
-            content="Haystack is an end-to-end framework for building LLM applications with retrieval-augmented generation.",
+            content=(
+                "Haystack is an end-to-end framework for building LLM applications with retrieval-augmented generation."
+            ),
             meta={"topic": "haystack", "type": "overview"},
         ),
         Document(
-            content="The SupabaseDocumentStore uses PostgreSQL with pgvector for efficient vector similarity search.",
+            content=("The SupabaseDocumentStore uses PostgreSQL with pgvector for efficient vector similarity search."),
             meta={"topic": "database", "type": "technical"},
         ),
         Document(
@@ -65,6 +67,7 @@ def setup_documents(document_store):
 
 
 def main():
+    """Run the hybrid search example."""
     print("=" * 70)
     print("Hybrid Search Example with SupabaseHybridRetriever")
     print("=" * 70)
@@ -136,7 +139,10 @@ def main():
     print("=" * 70)
 
     for alpha in [0.0, 0.3, 0.6, 1.0]:
-        print(f"\nAlpha = {alpha} ({'pure keyword' if alpha == 0 else 'pure semantic' if alpha == 1 else f'{int(alpha*100)}% semantic'})")
+        alpha_desc = (
+            "pure keyword" if alpha == 0 else "pure semantic" if alpha == 1 else f"{int(alpha * 100)}% semantic"
+        )
+        print(f"\nAlpha = {alpha} ({alpha_desc})")
         print("-" * 70)
 
         # Create retriever with specific alpha

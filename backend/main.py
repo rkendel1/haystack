@@ -13,12 +13,13 @@ To run:
 """
 
 from typing import Optional
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from haystack.dataclasses import Document
 from backend.document_store.supabase_store import get_supabase_store
-from backend.pipelines.rag_pipeline import retrieve, create_rag_pipeline
+from backend.pipelines.rag_pipeline import create_rag_pipeline, retrieve
+from haystack.dataclasses import Document
 
 app = FastAPI(title="Haystack Supabase RAG API")
 

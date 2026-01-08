@@ -43,13 +43,7 @@ class SupabaseHybridRetriever:
         ```
     """
 
-    def __init__(
-        self,
-        document_store,
-        alpha: float = 0.6,
-        top_k: int = 10,
-        filters: Optional[dict[str, Any]] = None,
-    ):
+    def __init__(self, document_store, alpha: float = 0.6, top_k: int = 10, filters: Optional[dict[str, Any]] = None):
         """
         Initialize the SupabaseHybridRetriever.
 

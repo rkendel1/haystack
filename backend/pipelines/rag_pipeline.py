@@ -12,12 +12,11 @@ and hybrid retrieval.
 import os
 from typing import Optional
 
-from haystack import Pipeline
-from haystack.components.embedders import OpenAITextEmbedder, OpenAIDocumentEmbedder
-from haystack.components.generators import OpenAIGenerator
-from haystack.components.builders import PromptBuilder
-
 from backend.document_store.supabase_store import get_supabase_store
+from haystack import Pipeline
+from haystack.components.builders import PromptBuilder
+from haystack.components.embedders import OpenAIDocumentEmbedder, OpenAITextEmbedder
+from haystack.components.generators import OpenAIGenerator
 from haystack.components.retrievers.supabase import SupabaseHybridRetriever
 
 

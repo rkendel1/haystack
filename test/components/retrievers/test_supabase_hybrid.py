@@ -120,9 +120,7 @@ class TestSupabaseHybridRetriever:
         embedding = [0.1] * 1536
 
         # Create more documents than top_k
-        docs = [
-            Document(content=f"Document {i}", embedding=[float(i) / 100] * 1536) for i in range(10)
-        ]
+        docs = [Document(content=f"Document {i}", embedding=[float(i) / 100] * 1536) for i in range(10)]
 
         document_store.write_documents(docs)
 

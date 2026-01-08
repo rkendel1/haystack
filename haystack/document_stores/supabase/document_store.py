@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Any, Optional
 import json
 import uuid
+from typing import Any, Optional
 
 from haystack import default_from_dict, default_to_dict, logging
 from haystack.dataclasses import Document
@@ -49,8 +49,7 @@ class SupabaseDocumentStore:
             self._sqlalchemy_text = text
         except ImportError as e:
             raise ImportError(
-                "SupabaseDocumentStore requires SQLAlchemy. "
-                "Install it with: pip install sqlalchemy psycopg2-binary"
+                "SupabaseDocumentStore requires SQLAlchemy. Install it with: pip install sqlalchemy psycopg2-binary"
             ) from e
 
         self.db_url = db_url
@@ -68,8 +67,7 @@ class SupabaseDocumentStore:
                 )
                 if not result.fetchone():
                     raise DocumentStoreError(
-                        "pgvector extension is not installed. "
-                        "Run: CREATE EXTENSION vector; in your database."
+                        "pgvector extension is not installed. Run: CREATE EXTENSION vector; in your database."
                     )
         except Exception as e:
             logger.warning(f"Could not verify pgvector extension: {e}")
@@ -108,16 +106,15 @@ class SupabaseDocumentStore:
         query = "SELECT id, content, metadata, embedding FROM documents"
         params = {}
 
-        if filters:
+        if filters and "field" in filters and filters["field"].startswith("meta."):
             # Simple metadata filter support
-            if "field" in filters and filters["field"].startswith("meta."):
-                meta_key = filters["field"].replace("meta.", "")
-                operator = filters.get("operator", "==")
-                value = filters.get("value")
+            meta_key = filters["field"].replace("meta.", "")
+            operator = filters.get("operator", "==")
+            value = filters.get("value")
 
-                if operator == "==":
-                    query += " WHERE metadata @> :metadata"
-                    params["metadata"] = json.dumps({meta_key: value})
+            if operator == "==":
+                query += " WHERE metadata @> :metadata"
+                params["metadata"] = json.dumps({meta_key: value})
 
         with self.engine.connect() as conn:
             result = conn.execute(self._sqlalchemy_text(query), params)
@@ -215,10 +212,7 @@ class SupabaseDocumentStore:
             return
 
         with self.engine.begin() as conn:
-            conn.execute(
-                self._sqlalchemy_text("DELETE FROM documents WHERE id = ANY(:ids)"),
-                {"ids": document_ids},
-            )
+            conn.execute(self._sqlalchemy_text("DELETE FROM documents WHERE id = ANY(:ids)"), {"ids": document_ids})
 
     def semantic_search(self, query_embedding: list[float], top_k: int = 10, filters: Optional[dict] = None):
         """
@@ -239,19 +233,16 @@ class SupabaseDocumentStore:
         WHERE embedding IS NOT NULL
         """
 
-        if filters:
+        if filters and "field" in filters and filters["field"].startswith("meta."):
             # Add simple metadata filtering
-            if "field" in filters and filters["field"].startswith("meta."):
-                meta_key = filters["field"].replace("meta.", "")
-                value = filters.get("value")
-                query += f" AND metadata @> '{json.dumps({meta_key: value})}'::jsonb"
+            meta_key = filters["field"].replace("meta.", "")
+            value = filters.get("value")
+            query += f" AND metadata @> '{json.dumps({meta_key: value})}'::jsonb"
 
         query += " ORDER BY embedding <=> :embedding::vector LIMIT :top_k"
 
         with self.engine.connect() as conn:
-            result = conn.execute(
-                self._sqlalchemy_text(query), {"embedding": embedding_str, "top_k": top_k}
-            )
+            result = conn.execute(self._sqlalchemy_text(query), {"embedding": embedding_str, "top_k": top_k})
             return [(row[0], row[1], row[2], row[3]) for row in result.fetchall()]
 
     def keyword_search(self, query_text: str, top_k: int = 10, filters: Optional[dict] = None):
@@ -270,12 +261,11 @@ class SupabaseDocumentStore:
         WHERE tsv @@ plainto_tsquery('english', :q)
         """
 
-        if filters:
+        if filters and "field" in filters and filters["field"].startswith("meta."):
             # Add simple metadata filtering
-            if "field" in filters and filters["field"].startswith("meta."):
-                meta_key = filters["field"].replace("meta.", "")
-                value = filters.get("value")
-                query += f" AND metadata @> '{json.dumps({meta_key: value})}'::jsonb"
+            meta_key = filters["field"].replace("meta.", "")
+            value = filters.get("value")
+            query += f" AND metadata @> '{json.dumps({meta_key: value})}'::jsonb"
 
         query += " ORDER BY score DESC LIMIT :top_k"
 

@@ -92,9 +92,7 @@ class TestSupabaseDocumentStore:
         """Test writing documents with embeddings."""
         embedding = [0.1] * 1536  # OpenAI embedding size
 
-        docs = [
-            Document(content="Document with embedding", embedding=embedding),
-        ]
+        docs = [Document(content="Document with embedding", embedding=embedding)]
 
         count = document_store.write_documents(docs)
         assert count == 1

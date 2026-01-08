@@ -21,6 +21,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!frontend/src/lib/
 lib64/
 parts/
 sdist/
@@ -154,6 +155,7 @@ haystack/document_store/qa.db
 **/mlruns/**
 src
 !docs-website/src/
+!frontend/src/
 models
 saved_models
 *_build

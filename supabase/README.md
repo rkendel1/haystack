@@ -153,7 +153,7 @@ from haystack.components.embedders import OpenAITextEmbedder
 from haystack.components.generators import OpenAIGenerator
 from haystack.components.builders import PromptBuilder
 from haystack.components.retrievers.supabase import SupabaseHybridRetriever
-from haystack.document_stores.supabase import SupabaseDocumentStore
+from backend.document_store.supabase_store import SupabaseDocumentStore
 
 # Create document store
 document_store = SupabaseDocumentStore(

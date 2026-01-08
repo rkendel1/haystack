@@ -15,7 +15,7 @@ from haystack import Pipeline, SuperComponent, component
 from haystack.components.builders import PromptBuilder
 from haystack.components.generators.chat import OpenAIChatGenerator
 from haystack.components.tools import ToolInvoker
-from haystack.components.websearch.serper_dev import SerperDevWebSearch
+from haystack.components.websearch.searxng import SearXNGWebSearch
 from haystack.core.pipeline.utils import _deepcopy_with_exceptions
 from haystack.dataclasses import ChatMessage, ChatRole, Document
 from haystack.tools import ComponentTool
@@ -690,11 +690,10 @@ class TestComponentToolInPipeline:
         assert tool_message.is_from(ChatRole.TOOL)
 
     @pytest.mark.skipif(not os.environ.get("OPENAI_API_KEY"), reason="OPENAI_API_KEY not set")
-    @pytest.mark.skipif(not os.environ.get("SERPERDEV_API_KEY"), reason="SERPERDEV_API_KEY not set")
     @pytest.mark.integration
-    def test_serper_dev_web_search_in_pipeline(self):
+    def test_searxng_web_search_in_pipeline(self):
         tool = ComponentTool(
-            component=SerperDevWebSearch(api_key=Secret.from_env_var("SERPERDEV_API_KEY"), top_k=3),
+            component=SearXNGWebSearch(base_url="http://localhost:8888", top_k=3),
             name="web_search",
             description="Search the web for current information on any topic",
         )
@@ -721,11 +720,10 @@ class TestComponentToolInPipeline:
         assert not tool_message.tool_call_result.error
 
     def test_serde_in_pipeline(self, monkeypatch):
-        monkeypatch.setenv("SERPERDEV_API_KEY", "test-key")
         monkeypatch.setenv("OPENAI_API_KEY", "test-key")
 
         # Create the search component and tool
-        search = SerperDevWebSearch(top_k=3)
+        search = SearXNGWebSearch(base_url="http://localhost:8888", top_k=3)
         tool = ComponentTool(component=search, name="web_search", description="Search the web for current information")
 
         # Create and configure the pipeline
@@ -744,9 +742,9 @@ class TestComponentToolInPipeline:
         tool_dict = pipeline_dict["components"]["tool_invoker"]["init_parameters"]["tools"][0]
         assert tool_dict["type"] == "haystack.tools.component_tool.ComponentTool"
         assert tool_dict["data"]["name"] == "web_search"
-        assert tool_dict["data"]["component"]["type"] == "haystack.components.websearch.serper_dev.SerperDevWebSearch"
+        assert tool_dict["data"]["component"]["type"] == "haystack.components.websearch.searxng.SearXNGWebSearch"
         assert tool_dict["data"]["component"]["init_parameters"]["top_k"] == 3
-        assert tool_dict["data"]["component"]["init_parameters"]["api_key"]["type"] == "env_var"
+        assert tool_dict["data"]["component"]["init_parameters"]["base_url"] == "http://localhost:8888"
 
         # Test round-trip serialization
         pipeline_yaml = pipeline.dumps()

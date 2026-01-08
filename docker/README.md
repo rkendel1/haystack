@@ -8,12 +8,50 @@
 
 This Docker setup includes [SearXNG](https://docs.searxng.org/), a free internet metasearch engine that aggregates results from various search services. SearXNG allows you to perform web searches without requiring API keys from commercial search providers.
 
+### Quick Start
+
 To start the SearXNG service:
 ```sh
+cd docker
 docker-compose up -d
 ```
 
-The SearXNG instance will be available at `http://localhost:8888` and can be used with the `SearXNGWebSearch` component in Haystack.
+The SearXNG instance will be available at `http://localhost:8888`.
+
+### Using SearXNG with Haystack
+
+Once the SearXNG service is running, you can use the `SearXNGWebSearch` component in Haystack:
+
+```python
+from haystack.components.websearch import SearXNGWebSearch
+
+# Create a SearXNG web search component
+web_search = SearXNGWebSearch(
+    base_url="http://localhost:8888",
+    top_k=5
+)
+
+# Perform a search
+results = web_search.run(query="What is machine learning?")
+print(results["documents"])
+```
+
+See the example file `example_searxng.py` for a complete working example.
+
+### Advantages of SearXNG
+
+- **Free**: No API keys or subscriptions required
+- **Privacy**: Self-hosted, no data sent to third parties
+- **Multi-source**: Aggregates results from multiple search engines
+- **Customizable**: Configure which search engines to use
+- **No Rate Limits**: Control your own instance
+
+### Stopping the Service
+
+To stop the SearXNG service:
+```sh
+docker-compose down
+```
 
 ## Haystack 2.0
 

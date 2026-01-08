@@ -143,7 +143,7 @@ class SearXNGWebSearch:
         :raises TimeoutError: If the request to the SearXNG API times out.
         """
         # SearXNG API expects parameters as query string
-        # Build parameters with required fields first, then add user params
+        # User params are spread first, then overridden by required params to ensure correct values
         params = {
             **self.search_params,
             "q": query,

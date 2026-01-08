@@ -143,10 +143,11 @@ class SearXNGWebSearch:
         :raises TimeoutError: If the request to the SearXNG API times out.
         """
         # SearXNG API expects parameters as query string
+        # Build parameters with required fields first, then add user params
         params = {
+            **self.search_params,
             "q": query,
             "format": "json",
-            **self.search_params
         }
 
         try:
@@ -179,10 +180,12 @@ class SearXNGWebSearch:
                 continue
             
             # Create document from result
+            title = result.get("title", "")
+            content = result.get("content", title)
             doc = Document(
-                content=result.get("content", result.get("title", "")),
+                content=content,
                 meta={
-                    "title": result.get("title", ""),
+                    "title": title,
                     "url": url,
                     "engine": result.get("engine", ""),
                     "score": result.get("score", 0),

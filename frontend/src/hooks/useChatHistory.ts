@@ -9,24 +9,31 @@ export const useChatHistory = () => {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
         setHistories(JSON.parse(stored));
-      } catch (e) {
-        console.error('Failed to parse chat history:', e);
       }
+    } catch (e) {
+      console.error('Failed to load chat history:', e);
     }
   }, []);
 
   // Save to localStorage whenever histories change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(histories));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(histories));
+    } catch (e) {
+      console.error('Failed to save chat history:', e);
+      // Handle quota exceeded or unavailability
+    }
   }, [histories]);
 
   const createHistory = (title: string): string => {
+    // Generate more robust ID using timestamp + random string
+    const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const newHistory: ChatHistory = {
-      id: Date.now().toString(),
+      id,
       title,
       messages: [],
       created_at: Date.now(),

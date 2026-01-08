@@ -1,6 +1,40 @@
-version: '3.8'
+version: '3.9'
 
 services:
+  supabase-db:
+    image: supabase/postgres:15.1.0.147
+    container_name: supabase-db
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ../supabase/data:/var/lib/postgresql/data
+      - ../supabase/init:/docker-entrypoint-initdb.d
+    networks:
+      - haystack-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ../backend
+    container_name: haystack-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@supabase-db:5432/postgres
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    networks:
+      - haystack-network
+    restart: unless-stopped
+
   frontend:
     build: ../frontend
     container_name: haystack-frontend

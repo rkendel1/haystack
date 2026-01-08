@@ -177,3 +177,6 @@ haystack/json-schemas
 
 # uv
 uv.lock
+
+# Supabase data directory (PostgreSQL data)
+supabase/data/

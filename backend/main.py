@@ -7,10 +7,19 @@ FastAPI backend for Supabase-backed RAG system.
 
 This module provides a simple REST API for indexing and searching documents.
 
-To run:
-    pip install fastapi uvicorn
+To run from project root (/Users/randy/Desktop/haystack):
+    pip install -r backend/requirements.txt
     uvicorn backend.main:app --reload --port 8000
+
+Or from backend/ directory:
+    cd backend
+    pip install -r requirements.txt
+    uvicorn main:app --reload --port 8000
 """
+
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from typing import List, Optional
 from uuid import UUID
@@ -31,6 +40,9 @@ from backend.pipelines.rag_pipeline import create_rag_pipeline, retrieve
 from backend.reasoning.context_extraction import OnboardingPipeline
 from backend.services.context_db import ContextDatabaseService
 from haystack.dataclasses import Document
+
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI(title="Haystack Supabase RAG API")
 

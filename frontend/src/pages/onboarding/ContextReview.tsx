@@ -7,11 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Check, X, Edit2, Building2, Scale, Users, TrendingUp, Shield, Lightbulb, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface ContextReviewProps {
-  sessionId: string;
-  onComplete: () => void;
-}
-
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   company: Building2,
   regulation: Scale,
@@ -30,7 +25,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   assumption: 'Baseline Assumptions',
 };
 
-export default function ContextReview({ sessionId, onComplete }: ContextReviewProps) {
+interface ContextReviewProps {
+  onComplete: () => void;
+  sessionId: string;
+}
+
+export default function ContextReview({ onComplete }: ContextReviewProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState<Record<string, any>>({});
   const [editError, setEditError] = useState<string | null>(null);

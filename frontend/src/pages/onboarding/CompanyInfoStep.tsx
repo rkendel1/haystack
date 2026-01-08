@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { startOnboarding } from '@/lib/contextApi';
 import { CompanyInfo } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Building2, Globe } from 'lucide-react';
 
@@ -39,9 +39,9 @@ export default function CompanyInfoStep({ onComplete }: CompanyInfoStepProps) {
             <Building2 className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-3xl">Welcome to Haystack</CardTitle>
-          <CardDescription className="text-lg mt-2">
+          <CardContent className="text-lg mt-2 p-0">
             Let's start by learning about your company. We'll discover relevant context to help you get started.
-          </CardDescription>
+          </CardContent>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">

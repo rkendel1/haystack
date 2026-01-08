@@ -297,3 +297,123 @@ class ContextDatabaseService:
                     created.append(ContextObject(**row))
                 conn.commit()
         return created
+
+    # Context Relationship operations
+
+    def create_relationship(
+        self, from_context_id: UUID, to_context_id: UUID, relationship_type: str, metadata: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Create a relationship between two context objects."""
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO context_links (from_context_id, to_context_id, relationship_type, metadata)
+                    VALUES (%(from_context_id)s, %(to_context_id)s, %(relationship_type)s, %(metadata)s)
+                    ON CONFLICT (from_context_id, to_context_id, relationship_type) DO NOTHING
+                    RETURNING *
+                    """,
+                    {
+                        "from_context_id": str(from_context_id),
+                        "to_context_id": str(to_context_id),
+                        "relationship_type": relationship_type,
+                        "metadata": psycopg2.extras.Json(metadata or {}),
+                    },
+                )
+                row = cur.fetchone()
+                conn.commit()
+                return dict(row) if row else None
+
+    def get_relationships(self, context_id: UUID, direction: str = "both") -> List[Dict[str, Any]]:
+        """
+        Get relationships for a context object.
+
+        Args:
+            context_id: The context object ID
+            direction: 'outgoing', 'incoming', or 'both'
+        """
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                if direction == "outgoing":
+                    cur.execute(
+                        """
+                        SELECT * FROM context_links
+                        WHERE from_context_id = %s
+                        ORDER BY created_at DESC
+                        """,
+                        (str(context_id),),
+                    )
+                elif direction == "incoming":
+                    cur.execute(
+                        """
+                        SELECT * FROM context_links
+                        WHERE to_context_id = %s
+                        ORDER BY created_at DESC
+                        """,
+                        (str(context_id),),
+                    )
+                else:  # both
+                    cur.execute(
+                        """
+                        SELECT * FROM context_links
+                        WHERE from_context_id = %s OR to_context_id = %s
+                        ORDER BY created_at DESC
+                        """,
+                        (str(context_id), str(context_id)),
+                    )
+                rows = cur.fetchall()
+                return [dict(row) for row in rows]
+
+    def delete_relationship(self, from_context_id: UUID, to_context_id: UUID, relationship_type: str) -> bool:
+        """Delete a specific relationship."""
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    DELETE FROM context_links
+                    WHERE from_context_id = %s AND to_context_id = %s AND relationship_type = %s
+                    RETURNING id
+                    """,
+                    (str(from_context_id), str(to_context_id), relationship_type),
+                )
+                result = cur.fetchone()
+                conn.commit()
+                return result is not None
+
+    def get_related_contexts(
+        self, context_id: UUID, relationship_type: Optional[str] = None, direction: str = "outgoing"
+    ) -> List[ContextObject]:
+        """
+        Get context objects related to a given context.
+
+        Args:
+            context_id: The source context object ID
+            relationship_type: Optional filter by relationship type
+            direction: 'outgoing' or 'incoming'
+        """
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                if direction == "outgoing":
+                    query = """
+                        SELECT co.* FROM context_objects co
+                        JOIN context_links cl ON co.id = cl.to_context_id
+                        WHERE cl.from_context_id = %s AND co.deleted_at IS NULL
+                    """
+                    params = [str(context_id)]
+                else:  # incoming
+                    query = """
+                        SELECT co.* FROM context_objects co
+                        JOIN context_links cl ON co.id = cl.from_context_id
+                        WHERE cl.to_context_id = %s AND co.deleted_at IS NULL
+                    """
+                    params = [str(context_id)]
+
+                if relationship_type:
+                    query += " AND cl.relationship_type = %s"
+                    params.append(relationship_type)
+
+                query += " ORDER BY co.created_at DESC"
+
+                cur.execute(query, params)
+                rows = cur.fetchall()
+                return [ContextObject(**row) for row in rows]

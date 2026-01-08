@@ -64,7 +64,7 @@ class ChatRequest(BaseModel):
 async def root():
     """Root endpoint."""
     return {
-        "message": "Haystack Supabase RAG API",
+        "message": "Haystack Supabase RAG API - First-Class Context Canonicalization",
         "endpoints": {
             "index": "/index - POST - Index a document",
             "search": "/search - POST - Search for documents",
@@ -82,7 +82,25 @@ async def root():
                 "confirm": "/context/{id}/confirm - POST - Confirm context object",
                 "reject": "/context/{id}/reject - POST - Reject context object",
             },
+            "relationships": {
+                "create": "/context/relationships - POST - Create relationship between contexts",
+                "get": "/context/{id}/relationships - GET - Get relationships for a context",
+                "related": "/context/{id}/related - GET - Get related context objects",
+                "delete": "/context/relationships - DELETE - Delete a relationship",
+            },
+            "canonical_types": {
+                "validate": "/context/validate - POST - Validate content against canonical schema",
+                "types": "/context/types - GET - Get information about canonical types",
+            },
         },
+        "canonical_types": [
+            "idea - Uncommitted concepts and hypotheses",
+            "decision - Explicit commitments",
+            "assumption - Beliefs taken as true",
+            "evidence - Support or refutation",
+            "plan - Intent and execution tracking",
+            "outcome - What actually happened",
+        ],
     }
 
 
@@ -361,6 +379,158 @@ async def reject_context(context_id: UUID):
         return context
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# RELATIONSHIP ENDPOINTS
+# ============================================================================
+
+
+class CreateRelationshipRequest(BaseModel):
+    """Request model for creating a relationship."""
+
+    from_context_id: UUID
+    to_context_id: UUID
+    relationship_type: str
+    metadata: Optional[dict] = None
+
+
+@app.post("/context/relationships")
+async def create_relationship(request: CreateRelationshipRequest):
+    """
+    Create a relationship between two context objects.
+
+    Example:
+        POST /context/relationships
+        {
+            "from_context_id": "uuid1",
+            "to_context_id": "uuid2",
+            "relationship_type": "supports",
+            "metadata": {"strength": "strong"}
+        }
+    """
+    try:
+        relationship = context_service.create_relationship(
+            from_context_id=request.from_context_id,
+            to_context_id=request.to_context_id,
+            relationship_type=request.relationship_type,
+            metadata=request.metadata,
+        )
+        if not relationship:
+            raise HTTPException(status_code=409, detail="Relationship already exists")
+        return relationship
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/context/{context_id}/relationships")
+async def get_relationships(context_id: UUID, direction: str = "both"):
+    """
+    Get relationships for a context object.
+
+    Query Parameters:
+        - direction: 'outgoing', 'incoming', or 'both' (default: both)
+    """
+    try:
+        relationships = context_service.get_relationships(context_id, direction=direction)
+        return {"context_id": str(context_id), "direction": direction, "relationships": relationships}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/context/{context_id}/related")
+async def get_related_contexts(
+    context_id: UUID, relationship_type: Optional[str] = None, direction: str = "outgoing"
+):
+    """
+    Get context objects related to a given context.
+
+    Query Parameters:
+        - relationship_type: Filter by relationship type (optional)
+        - direction: 'outgoing' or 'incoming' (default: outgoing)
+    """
+    try:
+        related = context_service.get_related_contexts(
+            context_id=context_id, relationship_type=relationship_type, direction=direction
+        )
+        return {"context_id": str(context_id), "relationship_type": relationship_type, "related_contexts": related}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/context/relationships")
+async def delete_relationship(from_context_id: UUID, to_context_id: UUID, relationship_type: str):
+    """
+    Delete a specific relationship.
+
+    Query Parameters:
+        - from_context_id: Source context ID
+        - to_context_id: Target context ID
+        - relationship_type: Type of relationship
+    """
+    try:
+        deleted = context_service.delete_relationship(
+            from_context_id=from_context_id, to_context_id=to_context_id, relationship_type=relationship_type
+        )
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Relationship not found")
+        return {"status": "deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# CANONICAL TYPE VALIDATION ENDPOINTS
+# ============================================================================
+
+
+@app.post("/context/validate")
+async def validate_canonical_type(context_type: str, content: dict):
+    """
+    Validate that content conforms to canonical schema for the given type.
+
+    Example:
+        POST /context/validate?context_type=idea
+        {
+            "problem_statement": "...",
+            "proposed_solution": "...",
+            ...
+        }
+    """
+    try:
+        from backend.models.canonical_types import validate_canonical_content
+
+        validated = validate_canonical_content(context_type, content)
+        return {"valid": True, "type": context_type, "validated_content": validated.model_dump()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/context/types")
+async def get_canonical_types():
+    """
+    Get information about canonical context types.
+
+    Returns the list of canonical types and their required fields.
+    """
+    try:
+        from backend.models.canonical_types import CANONICAL_TYPE_MAP, get_required_fields
+
+        types_info = {}
+        for type_name in CANONICAL_TYPE_MAP.keys():
+            types_info[type_name] = {
+                "required_fields": get_required_fields(type_name),
+                "schema": CANONICAL_TYPE_MAP[type_name].model_json_schema(),
+            }
+        return {"canonical_types": list(CANONICAL_TYPE_MAP.keys()), "types_info": types_info}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

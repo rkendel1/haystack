@@ -41,7 +41,7 @@ The Business Reasoning Substrate serves four foundational purposes:
 The Business Reasoning Substrate builds on existing infrastructure delivered in previous phases:
 
 #### 1. **Canonical Context Types** (6 Types)
-Defined in `backend/CANONICAL_TYPES.md` and implemented in `backend/models/canonical_types.py`:
+Defined in `backend/CANONICAL_TYPES.md`:
 
 - **Ideas** - Uncommitted concepts and hypotheses
 - **Decisions** - Explicit commitments with rationale and tradeoffs
@@ -50,7 +50,7 @@ Defined in `backend/CANONICAL_TYPES.md` and implemented in `backend/models/canon
 - **Plans** - Intent and execution tracking with dependencies
 - **Outcomes** - Expected vs. actual results with lessons learned
 
-Each type has strict Pydantic schema validation and required fields.
+Each type has strict schema validation and required fields as documented.
 
 #### 2. **Context Management Database** 
 Defined in `supabase/init/003_context_management.sql`:

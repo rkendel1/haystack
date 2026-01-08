@@ -49,7 +49,7 @@ assignees: ''
 
 **Reference Implementation:**
 - Database schema: `supabase/init/003_context_management.sql`
-- Canonical types: `backend/models/canonical_types.py`
+- Canonical types documentation: `backend/CANONICAL_TYPES.md`
 - Context service: `backend/services/context_db.py`
 - Hybrid search: `haystack/components/retrievers/supabase/`
 

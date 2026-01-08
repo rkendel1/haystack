@@ -120,7 +120,7 @@ class TestSearXNGWebSearch:
         assert ws.base_url == "http://localhost:8888"
         assert ws.top_k == 10
         assert ws.allowed_domains is None
-        assert ws.exclude_subdomains is False
+        assert not ws.exclude_subdomains
         assert ws.search_params == {}
 
     def test_to_dict(self):

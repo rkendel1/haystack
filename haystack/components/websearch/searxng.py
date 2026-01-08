@@ -158,6 +158,8 @@ class SearXNGWebSearch:
             response.raise_for_status()
         except requests.Timeout as error:
             raise TimeoutError(f"Request to {self.__class__.__name__} timed out.") from error
+        except requests.HTTPError as error:
+            raise SearXNGError(f"HTTP error occurred while querying {self.__class__.__name__}. Error: {error}") from error
         except requests.RequestException as e:
             raise SearXNGError(f"An error occurred while querying {self.__class__.__name__}. Error: {e}") from e
 

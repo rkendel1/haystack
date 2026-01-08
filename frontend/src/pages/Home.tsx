@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PipelineMode, ChatMessage } from '@/types';
 import Chat from '@/components/Chat';
 import FileUploader from '@/components/FileUploader';
@@ -7,7 +8,7 @@ import PipelineSwitcher from '@/components/PipelineSwitcher';
 import { useChatHistory } from '@/hooks/useChatHistory';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, FileText, Settings, Plus } from 'lucide-react';
+import { MessageSquare, FileText, Settings, Plus, Database } from 'lucide-react';
 
 const MAX_TITLE_LENGTH = 50;
 
@@ -49,10 +50,18 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <Button onClick={handleNewChat} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              New Chat
-            </Button>
+            <div className="flex gap-2">
+              <Link to="/context">
+                <Button variant="outline" size="sm">
+                  <Database className="h-4 w-4 mr-2" />
+                  Context
+                </Button>
+              </Link>
+              <Button onClick={handleNewChat} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                New Chat
+              </Button>
+            </div>
           </div>
         </div>
       </header>

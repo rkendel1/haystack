@@ -120,9 +120,10 @@ class SearXNGWebSearch:
                     # Exact domain match only
                     if domain == allowed_domain:
                         return True
-                # Allow subdomains (current behavior)
-                elif domain == allowed_domain or domain.endswith("." + allowed_domain):
-                    return True
+                else:
+                    # Allow subdomains (current behavior)
+                    if domain == allowed_domain or domain.endswith("." + allowed_domain):
+                        return True
 
             return False
         except Exception:
@@ -141,13 +142,6 @@ class SearXNGWebSearch:
         :raises SearXNGError: If an error occurs while querying the SearXNG API.
         :raises TimeoutError: If the request to the SearXNG API times out.
         """
-        # Build query with domain filtering if specified
-        query_parts = []
-        if self.allowed_domains:
-            for domain in self.allowed_domains:
-                query_parts.append(f"site:{domain}")
-            query = " OR ".join(query_parts) + " " + query
-
         # SearXNG API expects parameters as query string
         params = {
             "q": query,

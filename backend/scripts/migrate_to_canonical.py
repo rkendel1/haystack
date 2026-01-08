@@ -23,6 +23,7 @@ import sys
 from typing import List, Tuple
 
 import psycopg2
+import psycopg2.extras
 from psycopg2.extras import RealDictCursor
 
 # Add parent directory to path for imports

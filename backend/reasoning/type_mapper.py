@@ -14,15 +14,6 @@ This module provides utilities to:
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
-from backend.models.canonical_types import (
-    AssumptionContent,
-    DecisionContent,
-    EvidenceContent,
-    IdeaContent,
-    OutcomeContent,
-    PlanContent,
-)
-
 
 def infer_canonical_type(legacy_type: str, content: Dict[str, Any]) -> str:
     """

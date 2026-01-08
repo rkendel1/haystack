@@ -287,12 +287,12 @@ class TestSearXNGWebSearch:
         )
 
         # Should allow main domains and subdomains
-        assert ws_include._is_domain_allowed("https://example.com/page") == True
-        assert ws_include._is_domain_allowed("https://blog.example.com/post") == True
-        assert ws_include._is_domain_allowed("https://shop.example.com/product") == True
-        assert ws_include._is_domain_allowed("https://test.org/page") == True
-        assert ws_include._is_domain_allowed("https://sub.test.org/page") == True
-        assert ws_include._is_domain_allowed("https://other.com/page") == False
+        assert ws_include._is_domain_allowed("https://example.com/page")
+        assert ws_include._is_domain_allowed("https://blog.example.com/post")
+        assert ws_include._is_domain_allowed("https://shop.example.com/product")
+        assert ws_include._is_domain_allowed("https://test.org/page")
+        assert ws_include._is_domain_allowed("https://sub.test.org/page")
+        assert not ws_include._is_domain_allowed("https://other.com/page")
 
         # Test with exclude_subdomains=True
         ws_exclude = SearXNGWebSearch(
@@ -302,13 +302,13 @@ class TestSearXNGWebSearch:
         )
 
         # Should only allow exact domain matches
-        assert ws_exclude._is_domain_allowed("https://example.com/page") == True
-        assert ws_exclude._is_domain_allowed("https://blog.example.com/post") == False
-        assert ws_exclude._is_domain_allowed("https://shop.example.com/product") == False
-        assert ws_exclude._is_domain_allowed("https://test.org/page") == True
-        assert ws_exclude._is_domain_allowed("https://sub.test.org/page") == False
-        assert ws_exclude._is_domain_allowed("https://other.com/page") == False
+        assert ws_exclude._is_domain_allowed("https://example.com/page")
+        assert not ws_exclude._is_domain_allowed("https://blog.example.com/post")
+        assert not ws_exclude._is_domain_allowed("https://shop.example.com/product")
+        assert ws_exclude._is_domain_allowed("https://test.org/page")
+        assert not ws_exclude._is_domain_allowed("https://sub.test.org/page")
+        assert not ws_exclude._is_domain_allowed("https://other.com/page")
 
         # Test with no allowed_domains (should allow all)
         ws_no_filter = SearXNGWebSearch(base_url="http://localhost:8888", allowed_domains=None)
-        assert ws_no_filter._is_domain_allowed("https://any.domain.com/page") == True
+        assert ws_no_filter._is_domain_allowed("https://any.domain.com/page")

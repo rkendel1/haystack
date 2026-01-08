@@ -2,14 +2,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 from typing import Any, Optional, Union
 from urllib.parse import urlparse
 
 import requests
 
 from haystack import ComponentError, Document, component, default_from_dict, default_to_dict, logging
-from haystack.utils import Secret, deserialize_secrets_inplace
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +20,7 @@ class SearXNGWebSearch:
     """
     Uses [SearXNG](https://docs.searxng.org/) to search the web for relevant documents.
 
-    SearXNG is a free internet metasearch engine which aggregates results from various search services 
+    SearXNG is a free internet metasearch engine which aggregates results from various search services
     and databases. It can be self-hosted for privacy and no API key is required.
 
     Usage example:

@@ -15,7 +15,7 @@ This module defines the six canonical types that normalize all context artifacts
 """
 
 from datetime import date as DateType
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type
 from pydantic import BaseModel, Field
 
 
@@ -124,7 +124,7 @@ class OutcomeContent(BaseModel):
 
 
 # Map of canonical type names to their model classes
-CANONICAL_TYPE_MAP: Dict[str, type[BaseModel]] = {
+CANONICAL_TYPE_MAP: Dict[str, Type[BaseModel]] = {
     "idea": IdeaContent,
     "decision": DecisionContent,
     "assumption": AssumptionContent,

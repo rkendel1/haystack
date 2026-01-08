@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, FileText, Settings, Plus } from 'lucide-react';
 
+const MAX_TITLE_LENGTH = 50;
+
 export default function Home() {
   const [pipelineMode, setPipelineMode] = useState<PipelineMode>('rag');
   const [activeTab, setActiveTab] = useState<'chat' | 'documents'>('chat');
@@ -16,7 +18,10 @@ export default function Home() {
 
   const handleMessageSent = (message: ChatMessage) => {
     if (!currentHistoryId) {
-      const newHistoryId = createHistory(message.content.slice(0, 50) + '...');
+      const title = message.content.length > MAX_TITLE_LENGTH 
+        ? message.content.slice(0, MAX_TITLE_LENGTH) + '...'
+        : message.content;
+      const newHistoryId = createHistory(title);
       addMessage(newHistoryId, message);
     } else {
       addMessage(currentHistoryId, message);

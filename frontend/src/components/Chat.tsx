@@ -26,7 +26,7 @@ export default function Chat({ pipelineMode, onMessageSent }: ChatProps) {
     if (!query.trim() || isLoading) return;
 
     const userMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       role: 'user',
       content: query,
       timestamp: Date.now(),
@@ -40,7 +40,7 @@ export default function Chat({ pipelineMode, onMessageSent }: ChatProps) {
       const result = await refetch();
       if (result.data) {
         const assistantMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
+          id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           role: 'assistant',
           content: result.data.answer,
           documents: result.data.documents,

@@ -31,6 +31,7 @@ export default function ContextManagement() {
   const [filterSource, setFilterSource] = useState<ContextSource | 'all'>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState<Record<string, any>>({});
+  const [editError, setEditError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: contexts, isLoading } = useQuery({
@@ -79,15 +80,21 @@ export default function ContextManagement() {
   const handleEdit = (context: ContextObject) => {
     setEditingId(context.id);
     setEditContent(context.content);
+    setEditError(null);
   };
 
   const handleSaveEdit = (id: string) => {
+    if (editError) {
+      toast.error('Please fix JSON errors before saving');
+      return;
+    }
     updateMutation.mutate({ id, update: { content: editContent } });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditContent({});
+    setEditError(null);
   };
 
   const handleDelete = (id: string) => {
@@ -220,19 +227,28 @@ export default function ContextManagement() {
                                   value={JSON.stringify(editContent, null, 2)}
                                   onChange={(e) => {
                                     try {
-                                      setEditContent(JSON.parse(e.target.value));
+                                      const parsed = JSON.parse(e.target.value);
+                                      setEditContent(parsed);
+                                      setEditError(null);
                                     } catch (err) {
-                                      // Invalid JSON
+                                      setEditError((err as Error).message);
                                     }
                                   }}
-                                  className="w-full p-2 border rounded font-mono text-sm"
+                                  className={`w-full p-2 border rounded font-mono text-sm ${
+                                    editError ? 'border-red-500' : ''
+                                  }`}
                                   rows={8}
                                 />
+                                {editError && (
+                                  <div className="text-sm text-red-600">
+                                    Invalid JSON: {editError}
+                                  </div>
+                                )}
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
                                     onClick={() => handleSaveEdit(context.id)}
-                                    disabled={updateMutation.isPending}
+                                    disabled={updateMutation.isPending || !!editError}
                                   >
                                     Save
                                   </Button>

@@ -18,6 +18,11 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   assumption: Lightbulb,
 };
 
+// Configuration constants for discovery thresholds
+const MIN_CONTEXTS_FOR_COMPLETION = 5; // Minimum contexts needed before auto-advancing
+const EXPECTED_TOTAL_CONTEXTS = 15; // Expected total contexts for progress calculation
+const AUTO_ADVANCE_DELAY_MS = 1500; // Delay before auto-advancing after completion
+
 export default function ContextDiscovery({ sessionId, onComplete }: ContextDiscoveryProps) {
   const { data, isLoading } = useQuery({
     queryKey: ['onboarding-context', sessionId],
@@ -28,11 +33,11 @@ export default function ContextDiscovery({ sessionId, onComplete }: ContextDisco
 
   // Auto-advance when discovery is complete
   useEffect(() => {
-    if (data && data.contexts.length > 0 && data.progress.discovered >= 5) {
+    if (data && data.contexts.length > 0 && data.progress.discovered >= MIN_CONTEXTS_FOR_COMPLETION) {
       // Wait a bit before advancing to show completion
       const timer = setTimeout(() => {
         onComplete();
-      }, 1500);
+      }, AUTO_ADVANCE_DELAY_MS);
       return () => clearTimeout(timer);
     }
   }, [data, onComplete]);
@@ -63,7 +68,7 @@ export default function ContextDiscovery({ sessionId, onComplete }: ContextDisco
             <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
               <div
                 className="bg-primary h-full transition-all duration-500"
-                style={{ width: `${Math.min((discovered / 15) * 100, 100)}%` }}
+                style={{ width: `${Math.min((discovered / EXPECTED_TOTAL_CONTEXTS) * 100, 100)}%` }}
               />
             </div>
           </div>

@@ -197,16 +197,23 @@ async def start_onboarding(company_info: CompanyInfo):
     """
     try:
         # Create onboarding session
+        # TODO: Replace with actual user ID from authentication middleware
+        # For production, implement proper authentication and extract user_id from JWT/session
+        user_id = "demo_user"  # SECURITY: This must be replaced with authenticated user ID
+
         session = context_service.create_onboarding_session(
             OnboardingSessionCreate(
-                user_id="demo_user",  # TODO: Replace with actual user ID from auth
+                user_id=user_id,
                 company_name=company_info.name,
                 company_website=company_info.website,
                 industry=company_info.industry,
             )
         )
 
-        # Run context discovery in background (simplified for now - in production, use background tasks)
+        # Run context discovery in background
+        # TODO: Move to background task processing (e.g., Celery, FastAPI BackgroundTasks)
+        # For production, this should use async background processing to avoid request timeouts
+        # Example: background_tasks.add_task(run_context_discovery, session.id, company_info)
         discovered_contexts = onboarding_pipeline.run(
             company_name=company_info.name, website=company_info.website, industry=company_info.industry
         )
@@ -218,9 +225,7 @@ async def start_onboarding(company_info: CompanyInfo):
         context_service.bulk_create_context_objects(context_objects)
 
         # Update session step
-        context_service.update_onboarding_session(
-            session.id, OnboardingSessionUpdate(current_step="context_review")
-        )
+        context_service.update_onboarding_session(session.id, OnboardingSessionUpdate(current_step="context_review"))
 
         return session
     except Exception as e:

@@ -11,10 +11,26 @@ All outputs are provisional and require user review.
 
 import json
 import os
+import re
 from typing import Any, Dict, List, Optional
 
 from haystack.components.builders import PromptBuilder
 from haystack.components.generators import OpenAIGenerator
+
+
+def sanitize_input(text: str) -> str:
+    """
+    Sanitize user input to prevent prompt injection.
+
+    Removes or escapes potentially malicious content while preserving legitimate text.
+    """
+    # Remove control characters
+    text = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", text)
+    # Limit length to prevent excessive tokens
+    text = text[:500]
+    # Remove common prompt injection patterns
+    text = re.sub(r"(ignore|disregard|forget)\s+(previous|above|all)\s+(instructions|rules|prompts)", "", text, flags=re.IGNORECASE)
+    return text.strip()
 
 
 class CompanyContextExtractor:
@@ -29,11 +45,16 @@ class CompanyContextExtractor:
 
         Returns provisional company profile based on public information.
         """
+        # Sanitize inputs to prevent prompt injection
+        company_name = sanitize_input(company_name)
+        website = sanitize_input(website)
+        industry = sanitize_input(industry) if industry else "Unknown"
+
         prompt = f"""Analyze the following company information and provide a structured business context.
 
 Company Name: {company_name}
 Website: {website}
-Industry: {industry or 'Unknown'}
+Industry: {industry}
 
 Provide a JSON response with the following structure:
 {{

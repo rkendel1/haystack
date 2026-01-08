@@ -157,7 +157,7 @@ class TestSearXNGWebSearch:
         assert component.base_url == "http://localhost:8888"
         assert component.top_k == 5
         assert component.allowed_domains == ["example.com"]
-        assert component.exclude_subdomains is True
+        assert component.exclude_subdomains
         assert component.search_params == {"language": "en"}
 
     @pytest.mark.parametrize("top_k", [1, 5, 7])

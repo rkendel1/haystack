@@ -84,7 +84,7 @@ pip install -r requirements.txt
 ### Using the SupabaseDocumentStore
 
 ```python
-from haystack.document_stores.supabase import SupabaseDocumentStore
+from backend.document_store.supabase_store import SupabaseDocumentStore
 from haystack.dataclasses import Document
 
 # Initialize the document store
@@ -111,7 +111,7 @@ print(f"Total documents: {count}")
 from haystack import Pipeline
 from haystack.components.embedders import OpenAITextEmbedder
 from haystack.components.retrievers.supabase import SupabaseHybridRetriever
-from haystack.document_stores.supabase import SupabaseDocumentStore
+from backend.document_store.supabase_store import SupabaseDocumentStore
 
 # Create document store
 document_store = SupabaseDocumentStore(
@@ -142,6 +142,7 @@ result = pipeline.run({
 documents = result["retriever"]["documents"]
 for doc in documents:
     print(f"Score: {doc.score:.3f} - {doc.content}")
+```
 ```
 
 ### Building a RAG Pipeline

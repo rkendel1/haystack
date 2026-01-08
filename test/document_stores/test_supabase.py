@@ -5,8 +5,7 @@
 import pytest
 
 from haystack import Document
-from haystack.document_stores.errors import DuplicateDocumentError
-from haystack.document_stores.types import DuplicatePolicy
+from backend.document_store.supabase_store import DuplicateDocumentError, DuplicatePolicy
 
 
 # Skip all tests if sqlalchemy or psycopg2 not available
@@ -25,7 +24,7 @@ def db_url():
 @pytest.fixture
 def document_store(db_url):
     """Create a SupabaseDocumentStore for testing."""
-    from haystack.document_stores.supabase import SupabaseDocumentStore
+    from backend.document_store.supabase_store import SupabaseDocumentStore
 
     store = SupabaseDocumentStore(db_url=db_url)
 

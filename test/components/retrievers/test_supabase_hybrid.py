@@ -20,7 +20,7 @@ def db_url():
 @pytest.fixture
 def document_store(db_url):
     """Create a SupabaseDocumentStore for testing."""
-    from haystack.document_stores.supabase import SupabaseDocumentStore
+    from backend.document_store.supabase_store import SupabaseDocumentStore
 
     store = SupabaseDocumentStore(db_url=db_url)
 

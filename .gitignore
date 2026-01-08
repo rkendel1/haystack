@@ -157,6 +157,7 @@ src
 !docs-website/src/
 !frontend/src/
 models
+!backend/models/
 saved_models
 *_build
 rest_api/file-upload/*
